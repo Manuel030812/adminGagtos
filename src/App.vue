@@ -21,8 +21,20 @@ const definirPresupuesto = (cantidad) => {
 
 const mostrarModal = () => {
   modal.mostrar = true;
-  modal.animar = true;
+  setTimeout(() => {
+    modal.animar = true;
+  }, 300);
+  
 };  
+
+const cerraraModal = () => {
+  
+  modal.animar = false;
+  setTimeout(() => {
+    modal.mostrar = false;
+  }, 300);
+  
+};
 
 </script>
 
@@ -61,6 +73,8 @@ const mostrarModal = () => {
 
       <Modal
         v-if="modal.mostrar"
+        @cerrar-modal="cerraraModal"
+        :modal="modal"
       />
     </main>
 

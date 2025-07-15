@@ -2,8 +2,10 @@
 import Filter from './components/Filter.vue'
 import Presupuesto from './components/Presupuesto.vue'
 import Modal from './components/Modal.vue';
+import Gasto from './components/Gasto.vue';
 import ControlPresupuesto from './components/ControlPresupuesto.vue';
 import { ref,reactive } from 'vue';
+import { generarId } from './helpers';
 
 import iconoNuevoGasto from './assets/img/nuevo-gasto.svg';
 
@@ -13,6 +15,17 @@ const modal = reactive({
 });
 const presupuesto = ref(0);
 const disponible = ref(0);
+
+
+const gasto = reactive({
+  nombre: '',
+  cantidad: '',
+  categoria: '',
+  id: '',
+  fecha: Date.now()
+});
+
+const gastos = ref([]);
 
 const definirPresupuesto = (cantidad) => {
   presupuesto.value = cantidad;
@@ -34,6 +47,24 @@ const cerraraModal = () => {
     modal.mostrar = false;
   }, 300);
   
+};
+
+const guardarGasto = () => {
+  // Aquí puedes agregar la lógica para guardar el gasto
+  gastos.value.push({
+    ...gasto,
+    id:generarId() // Generar un ID único
+  });
+  cerraraModal();
+
+  // Limpiar el objeto gasto
+  Object.assign(gasto, {
+    nombre: '',
+    cantidad: '',
+    categoria: '',
+    id: null,
+    fecha: Date.now()
+  });
 };
 
 </script>
@@ -63,6 +94,18 @@ const cerraraModal = () => {
     </header>
 
     <main v-if="presupuesto > 0" >
+
+      <div class="listadoGastos contenedor">
+        <h2>{{ gastos.length > 0 ? 'Gastos': 'No hay gastos' }}</h2>
+
+        <Gasto v-for="gasto in gastos"
+          :key="gasto.id"
+          :gasto="gasto"
+        ></Gasto>
+
+      </div>
+
+
       <div class="crear-gasto">
 
         <img :src="iconoNuevoGasto" alt="icono nuevo gasto" 
@@ -74,7 +117,12 @@ const cerraraModal = () => {
       <Modal
         v-if="modal.mostrar"
         @cerrar-modal="cerraraModal"
+        @guardar-gasto="guardarGasto"
         :modal="modal"
+        v-model:nombre="gasto.nombre"
+        v-model:cantidad="gasto.cantidad"
+        v-model:categoria="gasto.categoria"
+        
       />
     </main>
 
@@ -163,4 +211,15 @@ header h1 {
   cursor: pointer;
 
 }
+.listadoGastos{
+margin-top: 10rem;
+
+
+}
+.listadoGastos h2{
+  font-weight: 900;
+  color: var(--gris-oscuro); 
+
+}
+
 </style>

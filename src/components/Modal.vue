@@ -13,21 +13,35 @@
         
         >
 
-            <form class="nuevoGasto" >
+            <form class="nuevoGasto"
+                @submit.prevent="agregarGasto"
+                >
                 <legend>
                     Añadir nuevo gasto
                 </legend>
+
+                <Alerta v-if="error">{{ error }}</Alerta>
+
                 <div class="campo">
                     <label for="nombre">Nombre Gasto:</label>
-                    <input type="text" id="nombre" placeholder="Añade el nombre del gasto" />
+                    <input type="text" id="nombre" placeholder="Añade el nombre del gasto"
+                        :value="nombre"
+                        @input="$emit('update:nombre', $event.target.value)"
+                    />
                 </div>
                 <div class="campo">
                     <label for="cantidad">Cantidad Gasto</label>
-                    <input type="number" id="cantidad" placeholder="Añade la cantidad del gasto ejem. 300" />
+                    <input type="number" id="cantidad" placeholder="Añade la cantidad del gasto ejem. 300"
+                        :value="cantidad"
+                        @input="$emit('update:cantidad', +$event.target.value)"
+                    />
                 </div>
                 <div class="campo">
                     <label for="categoria">Categoria</label>
-                    <select name="" id="categoria">
+                    <select name="" id="categoria"
+                        :value="categoria"
+                        @input="$emit('update:categoria', $event.target.value)"
+                    >
                         <option value="">--- Seleccione ---</option>
                         <option value="ahorro">Ahorro</option>
                         <option value="comida">Comida</option>
@@ -53,15 +67,57 @@
 </template>
 
 <script setup>
+import {ref} from 'vue';
 import cerraraModal from '../assets/img/cerrar.svg';
+import Alerta from './Alerta.vue';
 
-const emit = defineEmits(['cerrar-modal']);
+const error = ref('');
+
+const emit = defineEmits(['cerrar-modal','guardar-gasto','update:nombre', 'update:cantidad', 'update:categoria']);
 const props = defineProps({
   modal: {
     type: Object,
     required: true
-  }
+  },
+    nombre: {
+        type: String,
+        quired: true
+    },
+    cantidad: {
+        type: [String,Number],
+        required: true
+    },
+    categoria: {
+        type: String,
+        required: true
+    }
 });
+
+const agregarGasto = () => {
+  //validar que los campos no esten vacios
+  const { nombre, cantidad, categoria } = props;
+  if ([nombre, cantidad, categoria].includes('')) {
+    error.value = 'Todos los campos son obligatorios';
+    setTimeout(() => {
+      error.value = '';
+    }, 3000);
+    return;
+  }
+
+
+  //validar que la cantidad sea un numero
+
+    if (cantidad <= 0) {
+        error.value = 'Cantidad no es válida';
+        setTimeout(() => {
+            error.value = '';
+        }, 3000);
+        return;
+    }
+    
+    
+    emit('guardar-gasto');
+};
 
 </script>
 
